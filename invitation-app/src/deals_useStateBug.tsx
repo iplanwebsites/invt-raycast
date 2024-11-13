@@ -2,6 +2,53 @@ import { ActionPanel, closeMainWindow, Action, Icon, List, open } from "@raycast
 import { getIcon } from "./invt/resultUtils";
 import { useSearch } from "./invt/useSearch.tsx";
 
+
+/*
+
+
+[
+    {
+        "accentColorContrast": null,
+        "accentColorDarker": null,
+        "accentColorLighter": null,
+        "category": "Travel",
+        "domain": "cabify.com",
+        "icon": null,
+        "iconSquare": "https://d2xqxjfvpb1oa6.cloudfront.net/eyJidWNrZXQiOiJpbnZpdGF0aW9udXBsb2FkcyIsImtleSI6Imludml0YXRpb24uYXBwLk1vUWxCR1VSNS1pbnZpdGF0aW9uLXByb21vLWNvZGVzXzYxODA0ZTBjNGFmMjY1MDBkN2I2ZmZhZl8zOTIxNDEiLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjI1NiwiaGVpZ2h0IjoyNTYsImZpdCI6ImNvbnRhaW4iLCJ3aXRob3V0RW5sYXJnZW1lbnQiOnRydWV9fX0=",
+        "iconSquareAbsolute": "https://d2xqxjfvpb1oa6.cloudfront.net/eyJidWNrZXQiOiJpbnZpdGF0aW9udXBsb2FkcyIsImtleSI6Imludml0YXRpb24uYXBwLk1vUWxCR1VSNS1pbnZpdGF0aW9uLXByb21vLWNvZGVzXzYxODA0ZTBjNGFmMjY1MDBkN2I2ZmZhZl8zOTIxNDEiLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjI1NiwiaGVpZ2h0IjoyNTYsImZpdCI6ImNvbnRhaW4iLCJ3aXRob3V0RW5sYXJnZW1lbnQiOnRydWV9fX0=",
+        "iconSquareDefault": "https://d2xqxjfvpb1oa6.cloudfront.net/eyJidWNrZXQiOiJpbnZpdGF0aW9udXBsb2FkcyIsImtleSI6Imludml0YXRpb24uYXBwLk1vUWxCR1VSNS1pbnZpdGF0aW9uLXByb21vLWNvZGVzXzYxODA0ZTBjNGFmMjY1MDBkN2I2ZmZhZl8zOTIxNDEiLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjI1NiwiaGVpZ2h0IjoyNTYsImZpdCI6ImNvbnRhaW4iLCJ3aXRob3V0RW5sYXJnZW1lbnQiOnRydWV9fX0=",
+        "linkOrCode": "link",
+        "name": "Cabify",
+        "photoLarge": "",
+        "productSummary": "Cabify is a mobility service similiar to Uber & Bolt! Cabify is available in 8 countries and more than 40 cities around the world",
+        "psl": {
+            "domain": "cabify.com",
+            "input": "cabify.com",
+            "listed": true,
+            "sld": "cabify",
+            "subdomain": null,
+            "tld": "com"
+        },
+        "rewardSummary": "Download the app using a referral link and enjoy the rewards. Referrers and referrals can get 3 EUR discount for the next 3 rides.",
+        "s": "cabify",
+        "sld": "cabify",
+        "slug": "cabify",
+        "tags": [
+            "travel",
+            "ridesharing",
+            "transportation",
+            "app"
+        ],
+        "textColor": "",
+        "theyGet": "3 EUR discount for the next 3 rides",
+        "url": "/cabify",
+        "urlAbsolute": "https://invitation.codes/cabify",
+        "urlAddAbsolute": "https://invitation.codes/profile/add/cabify",
+        "youGet": "3 EUR discount for the next 3 rides"
+    },
+
+
+    */
 export default function Command() {
   const { isLoading, results, search, addHistory, deleteAllHistory, deleteHistoryItem } = useSearch("GENERAL");
 
@@ -15,7 +62,7 @@ export default function Command() {
         {results.map((item) => (
           <List.Item
             key={item.id}
-            title={item.query}
+            title={item.title || item.name}
             subtitle={item.description}
             icon={getIcon(item)}
             actions={

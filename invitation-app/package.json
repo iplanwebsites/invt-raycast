@@ -15,7 +15,14 @@
       "title": "deals",
       "subtitle": "Search for coupons, deals, and referral codes",
       "description": "",
-      "mode": "no-view"
+      "mode": "view"
+    },
+    {
+      "name": "deals_useStateBug",
+      "title": "deals_useStateBug",
+      "subtitle": "Search for coupons, deals, and referral codes",
+      "description": "",
+      "mode": "view"
     }
   ],
   "dependencies": {
