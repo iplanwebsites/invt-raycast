@@ -16,21 +16,7 @@
       "subtitle": "Search for coupons, deals, and referral codes",
       "description": "",
       "mode": "view"
-    },
-    {
-      "name": "td",
-      "title": "td",
-      "subtitle": "TouchDesigner Operators",
-      "description": "",
-      "mode": "view"
-    },
-    {
-      "name": "static",
-      "title": "static",
-      "subtitle": "Search for coupons, deals, and referral codes",
-      "description": "",
-      "mode": "view"
-    }
+    } 
   ],
   "dependencies": {
     "@raycast/api": "^1.85.2",
