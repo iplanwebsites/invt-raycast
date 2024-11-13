@@ -43,10 +43,11 @@ function mapToListItems(data) {
         setIsLoading(true);
         setError(null);
     
+        //save as autocomplete on web
         const response = await fetch(
           `https://api.invitation.codes/api/v2/referralPrograms/byTextSearch/${encodeURIComponent(
             searchTerm
-          )}?limit=10&domainOnly=true`,
+          )}?limit=10&nameOnly=true`,
           {
             method: "GET",
             headers: {

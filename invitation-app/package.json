@@ -3,7 +3,7 @@
   "name": "invitation-app",
   "title": "Invitation App",
   "description": "invitation.app - referral codes, deals and invites.",
-  "icon": "extension-icon.png",
+  "icon": "extension-icon2.png",
   "author": "menard",
   "categories": [
     "Finance"
@@ -18,8 +18,15 @@
       "mode": "view"
     },
     {
-      "name": "deals_useStateBug",
-      "title": "deals_useStateBug",
+      "name": "td",
+      "title": "td",
+      "subtitle": "TouchDesigner Operators",
+      "description": "",
+      "mode": "view"
+    },
+    {
+      "name": "static",
+      "title": "static",
       "subtitle": "Search for coupons, deals, and referral codes",
       "description": "",
       "mode": "view"
