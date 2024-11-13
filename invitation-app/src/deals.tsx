@@ -1,63 +1,57 @@
-import { ActionPanel, closeMainWindow, Action, Icon, List, open } from "@raycast/api";
-import { getIcon } from "./invt/resultUtils";
-import { useSearch } from "./invt/useSearch";
+import React from "react";
+import { ActionPanel, Action, List } from "@raycast/api";
+
+
+
+
+const u = "https://api.invitation.codes/api/v2/clientCountry"
+// Sample static data
+const listItems = [
+  {
+    id: "1",
+    title: "First Item",
+    subtitle: "This is the first item description",
+    icon: "🎯"
+  },
+  {
+    id: "2", 
+    title: "Second Item",
+    subtitle: "This is the second item description",
+    icon: "⭐️"
+  },
+  {
+    id: "3",
+    title: "Third Item",
+    subtitle: "This is the third item description",
+    icon: "🚀"
+  }
+];
 
 export default function Command() {
-  const { isLoading, results, search, addHistory, deleteAllHistory, deleteHistoryItem } = useSearch("GENERAL");
-
   return (
-    <List 
-      isLoading={isLoading} 
-      onSearchTextChange={search} 
-      searchBarPlaceholder="Search Naver or enter a URL..."
-    >
-      <List.Section title="Results" subtitle={results.length.toString()}>
-        {results.map((item) => (
-          <List.Item
-            key={item.id}
-            title={item.query}
-            subtitle={item.description}
-            icon={getIcon(item)}
-            actions={
-              <ActionPanel>
-                <ActionPanel.Section title="Result">
-                  <Action
-                    title="Open in Browser"
-                    onAction={async () => {
-                      await addHistory(item);
-                      await open(item.url);
-                      await closeMainWindow();
-                    }}
-                    icon={Icon.ArrowRight}
-                  />
-                  <Action.CopyToClipboard title="Copy URL to Clipboard" content={item.url} />
-                  <Action.CopyToClipboard title="Copy Suggestion to Clipboard" content={item.query} />
-                </ActionPanel.Section>
-
-                <ActionPanel.Section title="History">
-                  {item.isHistory && (
-                    <Action
-                      title="Remove From History"
-                      onAction={async () => {
-                        await deleteHistoryItem(item);
-                      }}
-                      icon={Icon.ExclamationMark}
-                      shortcut={{ modifiers: ["cmd"], key: "d" }}
-                    />
-                  )}
-                  <Action
-                    title="Clear All History"
-                    onAction={async () => {
-                      await deleteAllHistory();
-                    }}
-                    icon={Icon.ExclamationMark}
-                  />
-                </ActionPanel.Section>
-              </ActionPanel>
-            }
-          />
-        ))}
-      </List.Section>
+    
+    <List searchBarPlaceholder="Search items...">
+       
+      {listItems.map((item) => (
+        <List.Item
+          key={item.id}
+          icon={item.icon}
+          title={item.title}
+          subtitle={item.subtitle}
+          actions={
+            <ActionPanel>
+              <Action.CopyToClipboard 
+                title="Copy Title"
+                content={item.title} 
+              />
+              <Action.CopyToClipboard 
+                title="Copy Subtitle"
+                content={item.subtitle} 
+              />
+            </ActionPanel>
+          }
+        />
+      ))}
     </List>
   );
 }

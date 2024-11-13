@@ -1,143 +1,81 @@
-import { getPreferenceValues, LocalStorage, showToast, Toast } from "@raycast/api";
-import { AbortError } from "node-fetch";
-import { useState, useRef, useEffect } from "react";
-import { getAutoSearchResults, getSearchHistory, getStaticResult } from "./handleResults";
-import { SearchResult, HISTORY_KEY, Preferences } from "./types";
-import { SearchTypeDict } from "./types";
+import { useState, useEffect } from "react";
+import { showToast, Toast } from "@raycast/api";
 
-export function useSearch(searchType = "GENERAL") {
-  const { rememberSearchHistory } = getPreferenceValues<Preferences>();
-  const [isLoading, setIsLoading] = useState(true);
-  const [history, setHistory] = useState<SearchResult[]>([]);
-  const [staticResults, setStaticResults] = useState<SearchResult[]>([]);
-  const [historyResults, setHistoryResults] = useState<SearchResult[]>([]);
-  const [autoResults, setAutoResults] = useState<SearchResult[]>([]);
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [searchText, setSearchText] = useState("");
-  const cancelRef = useRef<AbortController | null>(null);
-  const isDict = SearchTypeDict[searchType].isDict;
+// Export the hook
+export function useSearch() {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [results, setResults] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
-    getHistory();
+    let isCancelled = false;
+    const controller = new AbortController();
 
-    return () => {
-      cancelRef.current?.abort();
-    };
-  }, []);
-
-  // Static result and filter history
-  useEffect(() => {
-    setStaticResults(getStaticResult(searchText, searchType));
-  }, [searchText]);
-
-  // Static result and filter history
-  useEffect(() => {
-    const lowerSearchText = searchText.toLowerCase();
-    setHistoryResults(history.filter((item) => item.query.toLowerCase().includes(lowerSearchText)));
-  }, [searchText, history]);
-
-  // Autosuggestions
-  useEffect(() => {
-    const fetchQuery = async () => {
-      cancelRef.current?.abort();
-      cancelRef.current = new AbortController();
+    async function fetchResults() {
+      if (!searchTerm.trim()) {
+        setResults([]);
+        setIsLoading(false);
+        return;
+      }
 
       try {
         setIsLoading(true);
+        setError(null);
 
-        if (searchText) {
-          const autoSearchResult = await getAutoSearchResults(searchText, searchType, cancelRef.current.signal);
-          setAutoResults(autoSearchResult);
-        } else {
-          setAutoResults([]);
+        const response = await fetch(
+          `https://invt.app/search/${encodeURIComponent(searchTerm)}`,
+          {
+            signal: controller.signal,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Search failed with status: ${response.status}`);
         }
 
-        setIsLoading(false);
-      } catch (error) {
-        if (error instanceof AbortError) {
-          return;
-        }
+        const data = await response.json();
 
-        console.error("Search error", error);
-        showToast(Toast.Style.Failure, "Could not perform search", String(error));
+        if (!isCancelled) {
+          setResults(data);
+          setIsLoading(false);
+        }
+      } catch (err) {
+        if (!isCancelled && err.name !== "AbortError") {
+          setError(err.message);
+          showToast({
+            style: Toast.Style.Failure,
+            title: "Search Error",
+            message: err.message,
+          });
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
       }
+    }
+
+    const timeoutId = setTimeout(() => {
+      fetchResults();
+    }, 300);
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(timeoutId);
+      controller.abort();
     };
+  }, [searchTerm]);
 
-    fetchQuery();
-  }, [searchText]);
-
-  // Combine all results
-  useEffect(() => {
-    const combinedResults = isDict
-      ? [...autoResults, ...staticResults, ...historyResults]
-      : [...staticResults, ...historyResults, ...autoResults];
-    const filteredResults = combinedResults.filter(
-      (value, index, self) => index === self.findIndex((t) => t.id === value.id)
-    );
-
-    setResults(filteredResults);
-  }, [staticResults, historyResults, autoResults]);
-
-  async function getHistory() {
-    const newHistory = await getSearchHistory();
-    setIsLoading(false);
-    setHistory(newHistory);
-  }
-
-  async function addHistory(result: SearchResult) {
-    const newHistory = [...history];
-
-    if (newHistory.some((item) => item.query === result.query)) {
-      return;
-    }
-
-    newHistory?.unshift({
-      ...result,
-      isHistory: true,
-    });
-
-    setHistory(newHistory);
-
-    if (rememberSearchHistory) {
-      await LocalStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
-    }
-  }
-
-  async function deleteAllHistory() {
-    await LocalStorage.removeItem(HISTORY_KEY);
-
-    setHistory([]);
-    showToast(Toast.Style.Success, "Cleared search history");
-  }
-
-  async function deleteHistoryItem(result: SearchResult) {
-    const newHistory = [...history];
-    const index = newHistory.findIndex((item) => item.query === result.query);
-
-    if (index < 0) {
-      return;
-    }
-
-    newHistory?.splice(index, 1);
-
-    await LocalStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
-
-    setHistory(newHistory);
-    showToast(Toast.Style.Success, "Removed from history");
-  }
-
-  async function search(query: string) {
-    setSearchText(query);
-  }
+  const search = (term: string) => {
+    setSearchTerm(term);
+  };
 
   return {
     isLoading,
     results,
-    searchText,
     search,
-    history,
-    addHistory,
-    deleteAllHistory,
-    deleteHistoryItem,
+    error,
+    searchTerm,
   };
 }
